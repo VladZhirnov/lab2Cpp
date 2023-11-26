@@ -1,11 +1,19 @@
 ﻿#include <iostream>
 #include <random>
+#include <stdexcept>
+
 
 template <typename T>
 struct Node {
+private:
     T data;
     Node* next;
-
+public:
+    Node() : data(0), next(nullptr) {}
+    T get_data() const;
+    T& get_data();
+    Node* get_next() const;
+    void set_next(Node* nextNode);
     Node(const T& value) : data(value), next(nullptr) {}
 };
 
@@ -13,7 +21,6 @@ template <typename T>
 class LinkedList {
 private:
     Node<T>* head;
-
 public:
     LinkedList();
     LinkedList(const LinkedList<T>& list);
@@ -21,9 +28,38 @@ public:
     ~LinkedList();
     LinkedList<T>& operator=(const LinkedList<T>& list);
     void swap(LinkedList<T>& list);
+    void push_tail(const Node<T>& element);
+    void push_tail(const LinkedList<T>& list);
+    void push_head(const Node<T>& element);
+    void push_head(const LinkedList<T>& list);
+    void pop_head();
+    void pop_tail();
+    void delete_node(const T& value);
     template<typename U>
     friend std::ostream& operator<<(std::ostream& stream, const LinkedList<U>& list);
+    T operator[](int index) const;
+    T& operator[](int index);
 };
+
+template <typename T>
+T Node<T>::get_data() const{
+    return data;
+}
+
+template <typename T>
+T& Node<T>::get_data() {
+    return data;
+}
+
+template <typename T>
+Node<T>* Node<T>::get_next() const {
+    return next;
+}
+
+template <typename T>
+void Node<T>::set_next(Node* nextNode) {
+    next = nextNode;
+}
 
 template <typename T>
 LinkedList<T>::LinkedList() : head(nullptr) {}
@@ -34,16 +70,16 @@ LinkedList<T>::LinkedList(const LinkedList<T>& list) {
     Node<T>* tmp2 = nullptr;
     head = nullptr;
     while (tmp1) {
-        Node<T>* newNode = new Node<T>(tmp1->data);
+        Node<T>* newNode = new Node<T>(tmp1->get_data());
         if (!head) {
             head = newNode;
             tmp2 = head;
         }
         else {
-            tmp2->next = newNode;
-            tmp2 = tmp2->next;
+            tmp2->set_next(newNode);
+            tmp2 = tmp2->get_next();
         }
-        tmp1 = tmp1->next;
+        tmp1 = tmp1->get_next();
     }
 }
 
@@ -52,18 +88,15 @@ LinkedList<T>::LinkedList(int size) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<T> dis(0, 9);
-
     head = nullptr;
-
     for (int i = 0; i < size; ++i) {
         T randomValue = dis(gen);
         Node<T>* newNode = new Node<T>(randomValue);
-
         if (!head) {
             head = newNode;
         }
         else {
-            newNode->next = head;
+            newNode->set_next(head);
             head = newNode;
         }
     }
@@ -74,7 +107,7 @@ LinkedList<T>::~LinkedList() {
     Node<T>* tmp = head;
     Node<T>* next;
     while (tmp) {
-        next = tmp->next;
+        next = tmp->get_next();
         delete tmp;
         tmp = next;
     }
@@ -82,7 +115,7 @@ LinkedList<T>::~LinkedList() {
 }
 template <typename T>
 LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T>& list) {
-    if (!*this == list) {
+    if (*this != list) {
         LinkedList<T> copy(list);
         copy.swap(*this);
     }
@@ -95,13 +128,158 @@ void LinkedList<T>::swap(LinkedList<T>& list) {
 }
 
 template <typename T>
+void LinkedList<T>::push_tail(const Node<T>& element) {
+    Node<T>* newNode = new Node<T>(element.get_data());
+    if (!head) {
+        head = newNode;
+    }
+    else {
+        Node<T>* tmp = head;
+        while (tmp->get_next()) {
+            tmp = tmp->get_next();
+        }
+        tmp->set_next(newNode);
+    }
+}
+
+template <typename T>
+void LinkedList<T>::push_tail(const LinkedList<T>& list) {
+    Node<T>* newListHead = list.head;
+    if (!newListHead) {
+        throw std::invalid_argument("Empty list!");
+    }
+    Node<T>* tmp = newListHead;
+    while (tmp) {
+        Node<T>* newEl = new Node<T>(tmp->get_data());
+        if (!head) {
+            head = newEl;
+        }
+        else {
+            Node<T>* lastNode = head;
+            while (lastNode->get_next()) {
+                lastNode = lastNode->get_next();
+            }
+            lastNode->set_next(newEl);
+        }
+        tmp = tmp->get_next();
+    }
+}
+
+template <typename T>
+void LinkedList<T>::push_head(const Node<T>& element) {
+    Node<T>* tmp = new Node<T>(element.get_data());
+    tmp->set_next(head);
+    head = tmp;
+}
+
+template <typename T>
+void LinkedList<T>::push_head(const LinkedList<T>& list) {
+    Node<T>* ListHead = list.head;
+    if (!ListHead) {
+        throw std::invalid_argument("Empty list!");
+    }
+    while (ListHead) {
+        Node<T>* newNode = new Node<T>(ListHead->get_data());
+        newNode->set_next(head);
+        head = newNode;
+        ListHead = ListHead->get_next();
+    }
+}
+
+template <typename T>
+void LinkedList<T>::pop_head() {
+    if (!head) {
+        throw std::out_of_range("List is empty!");
+    }
+    Node<T>* tmp = head;
+    head = head->get_next();
+    delete tmp;
+}
+
+template <typename T>
+void LinkedList<T>::pop_tail() {
+    if (!head) {
+        throw std::out_of_range("List is empty!");
+    }
+    if (!head->get_next()) {
+        delete head;
+        head = nullptr;
+    }
+    else {
+        Node<T>* tmp = head;
+        while (tmp->get_next()->get_next()) {
+            tmp = tmp->get_next();
+        }
+        delete tmp->get_next();
+        tmp->set_next(nullptr);
+    }
+}
+
+template <typename T>
+void LinkedList<T>::delete_node(const T& value) {
+    Node<T>* current = head;
+    Node<T>* previous = nullptr;
+    while (current) {
+        if (current->get_data() == value) {
+            if (previous) {
+                previous->set_next(current->get_next());
+                delete current;
+                current = previous->get_next();
+            }
+            else {
+                head = current->get_next();
+                delete current;
+                current = head;
+            }
+        }
+        else {
+            previous = current;
+            current = current->get_next();
+        }
+    }
+}
+
+
+template <typename T>
 std::ostream& operator<<(std::ostream& stream, const LinkedList<T>& list) {
     stream << "[";
     Node<T>* tmp = list.head;
     while (tmp) {
-        stream << "(" << tmp->data << ")";
-        tmp = tmp->next;
+        stream << "(" << tmp->get_data() << ")";
+        tmp = tmp->get_next();
     }
     stream << "]";
     return stream;
 }
+
+template <typename T>
+T LinkedList<T>::operator[](int index) const {
+    if (index < 0) {
+        throw std::out_of_range("Index is negative");
+    }
+    Node<T>* current = head;
+    for (int i = 0; i < index; ++i) {
+        current = current->get_next();
+    }
+    if (!current) {
+        throw std::out_of_range("Index is out of bounds");
+    }
+    return current->get_data();
+}
+
+template <typename T>
+T& LinkedList<T>::operator[](int index) {
+    if (index < 0) {
+        throw std::out_of_range("Index is negative");
+    }
+    Node<T>* current = head;
+    for (int i = 0; i < index; ++i) {
+        current = current->get_next();
+    }
+    if (!current) {
+        throw std::out_of_range("Index is out of bounds");
+    }
+    return current->get_data();
+}
+
+
