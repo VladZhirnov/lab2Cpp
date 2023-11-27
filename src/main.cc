@@ -8,7 +8,7 @@ int main() {
     LinkedList<int> abcd(randomList1);
     std::cout << abcd << std::endl;
     LinkedList<int> randomList2 = randomList1;
-    Node<int> a = 1;
+    Node<int> a(1);
     randomList2.push_tail(a);
     randomList2.push_tail(randomList1);
     randomList2.push_head(a);

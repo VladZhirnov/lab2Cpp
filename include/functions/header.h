@@ -1,20 +1,25 @@
 ﻿#include <iostream>
 #include <random>
 #include <stdexcept>
-
-
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <list>
 template <typename T>
 struct Node {
 private:
     T data;
     Node* next;
+    Node* prev;
 public:
-    Node() : data(0), next(nullptr) {}
+    Node() : data(0), next(nullptr), prev(nullptr) {}
     T get_data() const;
     T& get_data();
     Node* get_next() const;
+    Node* get_prev() const;
     void set_next(Node* nextNode);
-    Node(const T& value) : data(value), next(nullptr) {}
+    void set_prev(Node* prevNode);
+    Node(const T& value) : data(value), next(nullptr), prev(nullptr) {}
 };
 
 template <typename T>
@@ -42,7 +47,7 @@ public:
 };
 
 template <typename T>
-T Node<T>::get_data() const{
+T Node<T>::get_data() const {
     return data;
 }
 
@@ -57,8 +62,18 @@ Node<T>* Node<T>::get_next() const {
 }
 
 template <typename T>
+Node<T>* Node<T>::get_prev() const {
+    return prev;
+}
+
+template <typename T>
 void Node<T>::set_next(Node* nextNode) {
     next = nextNode;
+}
+
+template <typename T>
+void Node<T>::set_prev(Node* prevNode) {
+    prev = prevNode;
 }
 
 template <typename T>
@@ -77,6 +92,7 @@ LinkedList<T>::LinkedList(const LinkedList<T>& list) {
         }
         else {
             tmp2->set_next(newNode);
+            newNode->set_prev(tmp2);
             tmp2 = tmp2->get_next();
         }
         tmp1 = tmp1->get_next();
@@ -87,7 +103,7 @@ template <typename T>
 LinkedList<T>::LinkedList(int size) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<T> dis(0, 9);
+    std::uniform_int_distribution<T> dis(0, 100);
     head = nullptr;
     for (int i = 0; i < size; ++i) {
         T randomValue = dis(gen);
@@ -97,6 +113,7 @@ LinkedList<T>::LinkedList(int size) {
         }
         else {
             newNode->set_next(head);
+            head->set_prev(newNode);
             head = newNode;
         }
     }
@@ -113,6 +130,7 @@ LinkedList<T>::~LinkedList() {
     }
     head = nullptr;
 }
+
 template <typename T>
 LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T>& list) {
     if (*this != list) {
@@ -139,6 +157,7 @@ void LinkedList<T>::push_tail(const Node<T>& element) {
             tmp = tmp->get_next();
         }
         tmp->set_next(newNode);
+        newNode->set_prev(tmp);
     }
 }
 
@@ -160,6 +179,7 @@ void LinkedList<T>::push_tail(const LinkedList<T>& list) {
                 lastNode = lastNode->get_next();
             }
             lastNode->set_next(newEl);
+            newEl->set_prev(lastNode);
         }
         tmp = tmp->get_next();
     }
@@ -169,6 +189,9 @@ template <typename T>
 void LinkedList<T>::push_head(const Node<T>& element) {
     Node<T>* tmp = new Node<T>(element.get_data());
     tmp->set_next(head);
+    if (head) {
+        head->set_prev(tmp);
+    }
     head = tmp;
 }
 
@@ -181,6 +204,9 @@ void LinkedList<T>::push_head(const LinkedList<T>& list) {
     while (ListHead) {
         Node<T>* newNode = new Node<T>(ListHead->get_data());
         newNode->set_next(head);
+        if (head) {
+            head->set_prev(newNode);
+        }
         head = newNode;
         ListHead = ListHead->get_next();
     }
@@ -193,6 +219,9 @@ void LinkedList<T>::pop_head() {
     }
     Node<T>* tmp = head;
     head = head->get_next();
+    if (head) {
+        head->set_prev(nullptr);
+    }
     delete tmp;
 }
 
@@ -223,11 +252,17 @@ void LinkedList<T>::delete_node(const T& value) {
         if (current->get_data() == value) {
             if (previous) {
                 previous->set_next(current->get_next());
+                if (current->get_next()) {
+                    current->get_next()->set_prev(previous);
+                }
                 delete current;
                 current = previous->get_next();
             }
             else {
                 head = current->get_next();
+                if (head) {
+                    head->set_prev(nullptr);
+                }
                 delete current;
                 current = head;
             }
@@ -239,7 +274,6 @@ void LinkedList<T>::delete_node(const T& value) {
     }
 }
 
-
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const LinkedList<T>& list) {
     stream << "[";
@@ -247,6 +281,9 @@ std::ostream& operator<<(std::ostream& stream, const LinkedList<T>& list) {
     while (tmp) {
         stream << "(" << tmp->get_data() << ")";
         tmp = tmp->get_next();
+        if (tmp) {
+            stream << " <-> ";
+        }
     }
     stream << "]";
     return stream;
