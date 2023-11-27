@@ -320,3 +320,43 @@ T& LinkedList<T>::operator[](int index) {
 }
 
 
+const int MAX_RESIDENTS = 5;
+const int MAX_APARTMENTS = 5;
+
+class AddressBook {
+private:
+    std::list<std::string> apartments[MAX_APARTMENTS];
+public:
+    AddressBook();
+    void fillAddressBook();
+    void printAddressBook() const;
+};
+
+AddressBook::AddressBook() {
+    for (int i = 0; i < MAX_APARTMENTS; ++i) {
+        apartments[i] = std::list<std::string>();
+    }
+}
+
+void AddressBook::fillAddressBook() {
+    std::srand(std::time(0));
+    for (int i = 0; i < MAX_APARTMENTS; ++i) {
+        int numResidents = std::rand() % MAX_RESIDENTS + 1;
+
+        for (int j = 0; j < numResidents; ++j) {
+            std::string name = "Resident" + std::to_string(j + 1);
+            apartments[i].push_back(name);
+        }
+    }
+}
+
+void AddressBook::printAddressBook() const {
+    for (int i = 0; i < MAX_APARTMENTS; ++i) {
+        std::cout << "Apartment " << i + 1 << ": ";
+        for (const auto& resident : apartments[i]) {
+            std::cout << resident << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+

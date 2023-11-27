@@ -21,4 +21,8 @@ int main() {
     std::cout << randomList2 << std::endl;
     randomList2[1] = 10;
     std::cout << randomList2 << std::endl;
+
+    AddressBook addressBook;
+    addressBook.fillAddressBook();
+    addressBook.printAddressBook();
 }
