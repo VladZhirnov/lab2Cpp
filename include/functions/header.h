@@ -101,12 +101,12 @@ LinkedList<T>::LinkedList(const LinkedList<T>& list) {
 
 template <typename T>
 LinkedList<T>::LinkedList(int size) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<T> dis(0, 100);
+    std::random_device random_device;
+    std::mt19937 generator(random_device());
+    std::uniform_real_distribution<double> distribution(0, 100);
     head = nullptr;
     for (int i = 0; i < size; ++i) {
-        T randomValue = dis(gen);
+        T randomValue = static_cast<T>(distribution(generator));
         Node<T>* newNode = new Node<T>(randomValue);
         if (!head) {
             head = newNode;
@@ -328,8 +328,8 @@ private:
     std::list<std::string> apartments[MAX_APARTMENTS];
 public:
     AddressBook();
-    void fillAddressBook();
-    void printAddressBook() const;
+    void fill_AddressBook();
+    void print_AddressBook() const;
 };
 
 AddressBook::AddressBook() {
@@ -338,7 +338,7 @@ AddressBook::AddressBook() {
     }
 }
 
-void AddressBook::fillAddressBook() {
+void AddressBook::fill_AddressBook() {
     std::srand(std::time(0));
     for (int i = 0; i < MAX_APARTMENTS; ++i) {
         int numResidents = std::rand() % MAX_RESIDENTS + 1;
@@ -350,7 +350,7 @@ void AddressBook::fillAddressBook() {
     }
 }
 
-void AddressBook::printAddressBook() const {
+void AddressBook::print_AddressBook() const {
     for (int i = 0; i < MAX_APARTMENTS; ++i) {
         std::cout << "Apartment " << i + 1 << ": ";
         for (const auto& resident : apartments[i]) {
