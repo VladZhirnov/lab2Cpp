@@ -318,42 +318,47 @@ T& LinkedList<T>::operator[](int index) {
 
 
 const int MAX_RESIDENTS = 10;
-const int MAX_APARTMENTS = 10;
 
+template <typename T>
 class AddressBook {
 private:
-    std::list<std::string> apartments[MAX_APARTMENTS];
+    LinkedList<T>* apartments;
     int size;
 public:
-    AddressBook(int numApartments);
+    AddressBook(int n);
     void fill_AddressBook();
     void print_AddressBook() const;
 };
 
-AddressBook::AddressBook(int numApartments) {
-    size = 0;
-    for (int i = 0; i < numApartments; ++i) {
-        apartments[i] = std::list<std::string>();
-        size++;
-    }
+template <typename T>
+AddressBook<T>::AddressBook(int n) {
+    apartments = new LinkedList<T>[n];
+    size = n;
 }
 
-void AddressBook::fill_AddressBook() {
-    std::srand(static_cast<unsigned int>(std::time(0)));
+template <typename T>
+void AddressBook<T>::fill_AddressBook() {
     for (int i = 0; i < size; ++i) {
-        int numResidents = std::rand() % MAX_RESIDENTS + 1;
+        int numResidents = rand() % MAX_RESIDENTS;
         for (int j = 0; j < numResidents; ++j) {
             std::string name = "Resident" + std::to_string(j + 1);
-            apartments[i].push_back(name);
+            Node<T>* newNode = new Node<T>(name);
+            apartments[i].push_tail(*newNode);
         }
     }
 }
 
-void AddressBook::print_AddressBook() const {
+template <typename T>
+void AddressBook<T>::print_AddressBook() const {
     for (int i = 0; i < size; ++i) {
         std::cout << "Apartment " << i + 1 << ": ";
-        for (const auto& resident : apartments[i]) {
-            std::cout << resident << " ";
+        Node<T>* tmp = apartments[i].get_head();
+        while (tmp) {
+            std::cout << tmp->get_data();
+            tmp = tmp->get_next();
+            if (tmp) {
+                std::cout << " ";
+            }
         }
         std::cout << std::endl;
     }
