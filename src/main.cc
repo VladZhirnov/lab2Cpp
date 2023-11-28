@@ -22,11 +22,11 @@ int main() {
     std::cout << randomList2 << std::endl;
 
 
-    srand(time(0)); // Инициализация случайного зерна
+    srand(time(0));
     int numApartments;
     std::cout << "Enter the number of apartments: ";
     std::cin >> numApartments;
-    AddressBook<std::string> addressBook(numApartments); // Создаем книгу адресов с 5 квартирами (с использованием строк)
-    addressBook.fill_AddressBook();               // Заполняем книгу адресов случайными жителями
+    AddressBook<std::string> addressBook(numApartments);
+    addressBook.fill_AddressBook();              
     addressBook.print_AddressBook();
 }
