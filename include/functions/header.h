@@ -197,16 +197,27 @@ void LinkedList<T>::push_head(const Node<T>& element) {
 
 template <typename T>
 void LinkedList<T>::push_head(const LinkedList<T>& list) {
-    Node<T>* ListHead = list.head;
-    if (!ListHead) {
+    Node<T>* newListHead = list.head;
+    if (!newListHead) {
         throw std::invalid_argument("Empty list!");
     }
-    while (ListHead) {
-        Node<T>* newNode = new Node<T>(ListHead->get_data());
-        newNode->set_next(head);
-        head->set_prev(newNode);
-        head = newNode;
-        ListHead = ListHead->get_next();
+    std::list<T> reversedElements; 
+    Node<T>* tmp = newListHead;
+    while (tmp) {
+        reversedElements.push_front(tmp->get_data());
+        tmp = tmp->get_next();
+    }
+
+    for (const T& value : reversedElements) {
+        Node<T>* newEl = new Node<T>(value);
+        if (!head) {
+            head = newEl;
+        }
+        else {
+            newEl->set_next(head);
+            head->set_prev(newEl);
+            head = newEl;
+        }
     }
 }
 

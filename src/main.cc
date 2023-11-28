@@ -12,7 +12,8 @@ int main() {
     randomList2.push_tail(randomList1);
     randomList2.push_head(a);
     std::cout << randomList2 << std::endl;
-    LinkedList<int> randomList3(1);
+    LinkedList<int> randomList3(3);
+    std::cout << randomList3 << std::endl;
     randomList2.push_head(randomList3);
     randomList2.pop_head();
     randomList2.pop_tail();
