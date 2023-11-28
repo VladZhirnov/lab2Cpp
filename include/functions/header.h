@@ -137,10 +137,8 @@ LinkedList<T>::~LinkedList() {
 
 template <typename T>
 LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T>& list) {
-    if (*this != list) {
-        LinkedList<T> copy(list);
-        copy.swap(*this);
-    }
+    LinkedList<T> copy(list);
+    copy.swap(*this);
     return *this;
 }
 
@@ -318,11 +316,12 @@ T& LinkedList<T>::operator[](int index) {
 
 
 const int MAX_RESIDENTS = 10;
+const int MAX_APARTMENTS = 10;
 
 template <typename T>
 class AddressBook {
 private:
-    LinkedList<T>* apartments;
+    LinkedList<T> apartments[MAX_APARTMENTS];
     int size;
 public:
     AddressBook(int n);
@@ -332,8 +331,10 @@ public:
 
 template <typename T>
 AddressBook<T>::AddressBook(int n) {
-    apartments = new LinkedList<T>[n];
     size = n;
+    for (int i = 0; i < size; ++i) {
+        apartments[i] = LinkedList<T>();
+    }
 }
 
 template <typename T>
