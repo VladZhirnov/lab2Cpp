@@ -1,6 +1,5 @@
 ﻿#include <functions/header.h>
 #include <iostream>
-#include <complex>
 
 int main() {
     LinkedList<int> randomList1(5);
@@ -22,7 +21,11 @@ int main() {
     randomList2[1] = 10;
     std::cout << randomList2 << std::endl;
 
-    AddressBook addressBook;
+
+    int numApartments;
+    std::cout << "Enter the number of apartments: ";
+    std::cin >> numApartments;
+    AddressBook addressBook(numApartments);
     addressBook.fill_AddressBook();
     addressBook.print_AddressBook();
 }

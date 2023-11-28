@@ -2,9 +2,9 @@
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <cstdlib>
-#include <ctime>
 #include <list>
+
+
 template <typename T>
 struct Node {
 private:
@@ -28,6 +28,7 @@ private:
     Node<T>* head;
 public:
     LinkedList();
+    Node<T>* get_head() const;
     LinkedList(const LinkedList<T>& list);
     LinkedList(int size);
     ~LinkedList();
@@ -40,8 +41,6 @@ public:
     void pop_head();
     void pop_tail();
     void delete_node(const T& value);
-    template<typename U>
-    friend std::ostream& operator<<(std::ostream& stream, const LinkedList<U>& list);
     T operator[](int index) const;
     T& operator[](int index);
 };
@@ -74,6 +73,11 @@ void Node<T>::set_next(Node* nextNode) {
 template <typename T>
 void Node<T>::set_prev(Node* prevNode) {
     prev = prevNode;
+}
+
+template <typename T>
+Node<T>* LinkedList<T>::get_head() const {
+    return head;
 }
 
 template <typename T>
@@ -189,9 +193,7 @@ template <typename T>
 void LinkedList<T>::push_head(const Node<T>& element) {
     Node<T>* tmp = new Node<T>(element.get_data());
     tmp->set_next(head);
-    if (head) {
-        head->set_prev(tmp);
-    }
+    head->set_prev(tmp);
     head = tmp;
 }
 
@@ -204,9 +206,7 @@ void LinkedList<T>::push_head(const LinkedList<T>& list) {
     while (ListHead) {
         Node<T>* newNode = new Node<T>(ListHead->get_data());
         newNode->set_next(head);
-        if (head) {
-            head->set_prev(newNode);
-        }
+        head->set_prev(newNode);
         head = newNode;
         ListHead = ListHead->get_next();
     }
@@ -277,13 +277,10 @@ void LinkedList<T>::delete_node(const T& value) {
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const LinkedList<T>& list) {
     stream << "[";
-    Node<T>* tmp = list.head;
+    Node<T>* tmp = list.get_head();
     while (tmp) {
         stream << "(" << tmp->get_data() << ")";
         tmp = tmp->get_next();
-        if (tmp) {
-            stream << " <-> ";
-        }
     }
     stream << "]";
     return stream;
@@ -320,29 +317,31 @@ T& LinkedList<T>::operator[](int index) {
 }
 
 
-const int MAX_RESIDENTS = 5;
-const int MAX_APARTMENTS = 5;
+const int MAX_RESIDENTS = 10;
+const int MAX_APARTMENTS = 10;
 
 class AddressBook {
 private:
     std::list<std::string> apartments[MAX_APARTMENTS];
+    int size;
 public:
-    AddressBook();
+    AddressBook(int numApartments);
     void fill_AddressBook();
     void print_AddressBook() const;
 };
 
-AddressBook::AddressBook() {
-    for (int i = 0; i < MAX_APARTMENTS; ++i) {
+AddressBook::AddressBook(int numApartments) {
+    size = 0;
+    for (int i = 0; i < numApartments; ++i) {
         apartments[i] = std::list<std::string>();
+        size++;
     }
 }
 
 void AddressBook::fill_AddressBook() {
-    std::srand(std::time(0));
-    for (int i = 0; i < MAX_APARTMENTS; ++i) {
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    for (int i = 0; i < size; ++i) {
         int numResidents = std::rand() % MAX_RESIDENTS + 1;
-
         for (int j = 0; j < numResidents; ++j) {
             std::string name = "Resident" + std::to_string(j + 1);
             apartments[i].push_back(name);
@@ -351,7 +350,7 @@ void AddressBook::fill_AddressBook() {
 }
 
 void AddressBook::print_AddressBook() const {
-    for (int i = 0; i < MAX_APARTMENTS; ++i) {
+    for (int i = 0; i < size; ++i) {
         std::cout << "Apartment " << i + 1 << ": ";
         for (const auto& resident : apartments[i]) {
             std::cout << resident << " ";
@@ -359,4 +358,3 @@ void AddressBook::print_AddressBook() const {
         std::cout << std::endl;
     }
 }
-
